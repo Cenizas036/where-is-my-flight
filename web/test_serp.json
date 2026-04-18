@@ -1,0 +1,17 @@
+{
+  "search_metadata": {
+    "id": "69e28c636c3283ab881b73c8",
+    "status": "Success",
+    "json_endpoint": "https://serpapi.com/searches/Blhlrt0sqoogBV14gJlDiA/69e28c636c3283ab881b73c8.json",
+    "created_at": "2026-04-17 19:39:15 UTC",
+    "processed_at": "2026-04-17 19:39:15 UTC",
+    "google_flights_url": "https://www.google.com/travel/flights?hl=en&gl=us&curr=INR&tfs=CBwQAhoeEgoyMDI2LTA0LTIwagcIARIDREVMcgcIARIDQk9NQAFIAXABmAEC&tfu=EgIIAQ",
+    "raw_html_file": "https://serpapi.com/searches/Blhlrt0sqoogBV14gJlDiA/69e28c636c3283ab881b73c8.html",
+    "prettify_html_file": "https://serpapi.com/searches/Blhlrt0sqoogBV14gJlDiA/69e28c636c3283ab881b73c8.prettify",
+    "total_time_taken": 0.9
+  },
+  "search_parameters": {
+    "engine": "google_flights",
+    "hl": "en",
+    "gl": "us",
+    "ty

@@ -1,0 +1,621 @@
+/* ================================================================
+ *  WHERE IS MY FLIGHT — Premium Design System v3
+ *  Aviation-themed design with radar, flight paths, dramatic backgrounds
+ * ================================================================ */
+
+/* ══════════════════════════════════════════════
+ *  THEME SYSTEM — CSS Custom Properties
+ * ══════════════════════════════════════════════ */
+
+/* ── Dark Theme (Default) ── */
+[data-theme="dark"] {
+  --bg-primary: #020617;
+  --bg-secondary: #0a1628;
+  --bg-card: rgba(8, 18, 40, 0.75);
+  --bg-card-hover: rgba(12, 25, 55, 0.85);
+  --bg-nav: rgba(2, 6, 23, 0.9);
+  --bg-input: rgba(15, 25, 45, 0.8);
+
+  --text-primary: #f0f4ff;
+  --text-secondary: #94a3cc;
+  --text-muted: #5a6a8a;
+  --text-nav: #94a3cc;
+
+  --border-primary: rgba(50, 70, 120, 0.3);
+  --border-card: rgba(40, 60, 110, 0.25);
+  --border-nav: rgba(40, 60, 110, 0.4);
+  --border-footer: rgba(40, 60, 110, 0.2);
+
+  --glass-bg: rgba(8, 16, 36, 0.65);
+  --glass-border: rgba(50, 80, 140, 0.2);
+  --glass-shadow: 0 4px 32px rgba(0, 0, 0, 0.5);
+
+  --aurora-1: rgba(51, 145, 255, 0.12);
+  --aurora-2: rgba(139, 92, 246, 0.08);
+  --aurora-3: rgba(16, 185, 129, 0.06);
+
+  --particle-color: rgba(51, 145, 255, 0.15);
+  --grid-color: rgba(51, 145, 255, 0.04);
+  --radar-color: rgba(51, 145, 255, 0.06);
+  --path-color: rgba(51, 145, 255, 0.08);
+  --scrollbar-thumb: rgba(60, 80, 130, 0.5);
+
+  --wimf-glow: 0 0 30px rgba(51, 145, 255, 0.15);
+}
+
+/* ── Light Theme ── */
+[data-theme="light"] {
+  --bg-primary: #edf2ff;
+  --bg-secondary: #dbe4f8;
+  --bg-card: rgba(255, 255, 255, 0.8);
+  --bg-card-hover: rgba(255, 255, 255, 0.92);
+  --bg-nav: rgba(255, 255, 255, 0.85);
+  --bg-input: rgba(255, 255, 255, 0.9);
+
+  --text-primary: #0c1629;
+  --text-secondary: #3d4f6e;
+  --text-muted: #7a8ba8;
+  --text-nav: #3d4f6e;
+
+  --border-primary: rgba(80, 110, 180, 0.15);
+  --border-card: rgba(80, 110, 180, 0.12);
+  --border-nav: rgba(80, 110, 180, 0.2);
+  --border-footer: rgba(80, 110, 180, 0.12);
+
+  --glass-bg: rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(80, 110, 180, 0.15);
+  --glass-shadow: 0 4px 32px rgba(40, 60, 120, 0.08);
+
+  --aurora-1: rgba(51, 145, 255, 0.08);
+  --aurora-2: rgba(139, 92, 246, 0.06);
+  --aurora-3: rgba(16, 185, 129, 0.04);
+
+  --particle-color: rgba(51, 100, 200, 0.12);
+  --grid-color: rgba(51, 100, 200, 0.04);
+  --radar-color: rgba(51, 100, 200, 0.06);
+  --path-color: rgba(51, 100, 200, 0.1);
+  --scrollbar-thumb: rgba(100, 130, 200, 0.3);
+
+  --wimf-glow: 0 0 30px rgba(51, 145, 255, 0.08);
+}
+
+/* ══════════════════════════════════════════════
+ *  BASE STYLES
+ * ══════════════════════════════════════════════ */
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.5s ease, color 0.5s ease;
+  overflow-x: hidden;
+}
+
+/* ══════════════════════════════════════════════
+ *  ✈  AVIATION BACKGROUND — The Star of the Show
+ *  Radar circles + grid lines + flight paths + aurora
+ * ══════════════════════════════════════════════ */
+
+.aurora-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* ── Radar grid overlay ── */
+.aurora-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    /* Horizontal grid lines */
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 79px,
+      var(--grid-color) 80px
+    ),
+    /* Vertical grid lines */
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 79px,
+      var(--grid-color) 80px
+    );
+  z-index: 1;
+}
+
+/* ── Dashed flight path lines ── */
+.aurora-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    /* Diagonal flight path 1 — top-left to bottom-right */
+    linear-gradient(
+      35deg,
+      transparent 0%, transparent 49.5%,
+      var(--path-color) 49.5%, var(--path-color) 50.5%,
+      transparent 50.5%, transparent 100%
+    ),
+    /* Diagonal flight path 2 — crossing */
+    linear-gradient(
+      -25deg,
+      transparent 0%, transparent 49.5%,
+      var(--path-color) 49.5%, var(--path-color) 50.5%,
+      transparent 50.5%, transparent 100%
+    ),
+    /* Curved flight path 3 */
+    linear-gradient(
+      65deg,
+      transparent 0%, transparent 49.5%,
+      var(--path-color) 49.5%, var(--path-color) 50.5%,
+      transparent 50.5%, transparent 100%
+    );
+  background-size: 100% 100%, 100% 100%, 100% 100%;
+  opacity: 0.5;
+  z-index: 1;
+}
+
+/* ── Aurora gradient blobs ── */
+.aurora-gradient {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.9;
+}
+
+.aurora-1 {
+  width: 70vw;
+  height: 70vh;
+  top: -25%;
+  left: -15%;
+  background: radial-gradient(ellipse, var(--aurora-1) 0%, transparent 65%);
+  animation: aurora1Move 14s ease-in-out infinite alternate;
+}
+
+.aurora-2 {
+  width: 55vw;
+  height: 55vh;
+  top: 35%;
+  right: -20%;
+  background: radial-gradient(ellipse, var(--aurora-2) 0%, transparent 65%);
+  animation: aurora2Move 18s ease-in-out infinite alternate;
+}
+
+.aurora-3 {
+  width: 50vw;
+  height: 50vh;
+  bottom: -15%;
+  left: 25%;
+  background: radial-gradient(ellipse, var(--aurora-3) 0%, transparent 65%);
+  animation: aurora3Move 22s ease-in-out infinite alternate;
+}
+
+@keyframes aurora1Move {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(18vw, 12vh) scale(1.4); }
+}
+
+@keyframes aurora2Move {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-22vw, -18vh) scale(1.3); }
+}
+
+@keyframes aurora3Move {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(12vw, -22vh) scale(1.5); }
+}
+
+/* ── Radar circles (centered expanding rings) ── */
+.aurora-gradient.radar-ring-1,
+.aurora-gradient.radar-ring-2,
+.aurora-gradient.radar-ring-3 {
+  border-radius: 50%;
+  filter: none;
+  background: none;
+  border: 1px solid var(--radar-color);
+  opacity: 1;
+}
+
+/* ══════════════════════════════════════════════
+ *  FLOATING AIRPLANE PARTICLES
+ * ══════════════════════════════════════════════ */
+
+.airplane-particles {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  font-size: 16px;
+  color: var(--particle-color);
+  top: var(--top, 50%);
+  left: -40px;
+  animation: floatAcross var(--duration, 25s) linear var(--delay, 0s) infinite;
+  opacity: 0;
+  filter: drop-shadow(0 0 6px rgba(51, 145, 255, 0.3));
+}
+
+/* Some particles go right-to-left */
+.particle.reverse {
+  left: auto;
+  right: -40px;
+  animation: floatAcrossReverse var(--duration, 25s) linear var(--delay, 0s) infinite;
+}
+
+@keyframes floatAcross {
+  0% {
+    transform: translateX(-40px) rotate(-15deg) scale(0.8);
+    opacity: 0;
+  }
+  3% { opacity: 0.7; }
+  97% { opacity: 0.7; }
+  100% {
+    transform: translateX(calc(100vw + 40px)) rotate(-15deg) scale(0.8);
+    opacity: 0;
+  }
+}
+
+@keyframes floatAcrossReverse {
+  0% {
+    transform: translateX(40px) rotate(195deg) scale(0.8);
+    opacity: 0;
+  }
+  3% { opacity: 0.5; }
+  97% { opacity: 0.5; }
+  100% {
+    transform: translateX(calc(-100vw - 40px)) rotate(195deg) scale(0.8);
+    opacity: 0;
+  }
+}
+
+/* ══════════════════════════════════════════════
+ *  NAVIGATION — GLASSMORPHIC
+ * ══════════════════════════════════════════════ */
+
+.nav-glass {
+  background: var(--bg-nav);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  border-bottom: 1px solid var(--border-nav);
+  transition: background 0.5s ease, border-color 0.5s ease;
+}
+
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-nav);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-link:hover {
+  color: var(--text-primary);
+  background: var(--bg-card);
+}
+
+.nav-link-active {
+  color: var(--text-primary) !important;
+  background: var(--bg-card) !important;
+  box-shadow: var(--wimf-glow);
+}
+
+.nav-text { color: var(--text-secondary); }
+
+.theme-toggle-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  color: var(--text-secondary);
+}
+
+.theme-toggle-btn:hover {
+  border-color: #3391ff;
+  color: #3391ff;
+  box-shadow: 0 0 20px rgba(51, 145, 255, 0.15);
+}
+
+/* ══════════════════════════════════════════════
+ *  GLASSMORPHISM CARDS
+ * ══════════════════════════════════════════════ */
+
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(200%);
+  -webkit-backdrop-filter: blur(16px) saturate(200%);
+  border: 1px solid var(--glass-border);
+}
+
+.glass-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  border: 1px solid var(--border-card);
+  box-shadow: var(--glass-shadow);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  border-color: rgba(51, 145, 255, 0.35);
+  box-shadow: var(--glass-shadow), var(--wimf-glow);
+  transform: translateY(-2px);
+  background: var(--bg-card-hover);
+}
+
+/* ══════════════════════════════════════════════
+ *  GRADIENT TEXT
+ * ══════════════════════════════════════════════ */
+
+.gradient-text {
+  background: linear-gradient(135deg, #59b2ff 0%, #3391ff 30%, #8b5cf6 60%, #ec4899 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 300% auto;
+  animation: gradientShift 6s ease-in-out infinite;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ══════════════════════════════════════════════
+ *  FOOTER
+ * ══════════════════════════════════════════════ */
+
+.footer-border { border-color: var(--border-footer); }
+.footer-text { color: var(--text-muted); }
+.footer-text-dim { color: var(--text-muted); opacity: 0.7; }
+
+/* ══════════════════════════════════════════════
+ *  HEADING INDICATOR (Rotating airplane)
+ * ══════════════════════════════════════════════ */
+
+.heading-indicator {
+  transition: transform 0.5s ease;
+  filter: drop-shadow(0 0 8px rgba(51, 145, 255, 0.5));
+  color: var(--particle-color);
+  opacity: 0.8;
+}
+
+.glass-card:hover .heading-indicator {
+  filter: drop-shadow(0 0 12px rgba(51, 145, 255, 0.7));
+  opacity: 1;
+}
+
+.flight-card {
+  opacity: 0;
+  animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* ══════════════════════════════════════════════
+ *  ANIMATIONS
+ * ══════════════════════════════════════════════ */
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 20px rgba(51, 145, 255, 0.1); }
+  50% { box-shadow: 0 0 50px rgba(51, 145, 255, 0.25); }
+}
+
+@keyframes radarSweep {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.fade-in-up { animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+.scale-in { animation: scaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+.float-animation { animation: float 3s ease-in-out infinite; }
+.pulse-glow { animation: pulseGlow 3s ease-in-out infinite; }
+
+/* ══════════════════════════════════════════════
+ *  BOARD ROW STYLES (kept for legacy views)
+ * ══════════════════════════════════════════════ */
+
+.board-row {
+  animation: fadeInUp 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  min-height: 64px;
+  position: relative;
+}
+
+.board-row::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 24px;
+  right: 24px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-card), transparent);
+}
+
+.status-live { animation: pulseGlow 2s ease-in-out infinite; }
+
+/* ── Prediction Bar ── */
+.prediction-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--bg-card);
+  overflow: hidden;
+}
+
+.prediction-fill {
+  height: 100%;
+  border-radius: 3px;
+  position: relative;
+}
+
+.prediction-fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%);
+  animation: shimmer 2s linear infinite;
+  background-size: 200% 100%;
+}
+
+.prediction-low  { background: linear-gradient(90deg, #10b981, #34d399); }
+.prediction-mid  { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.prediction-high { background: linear-gradient(90deg, #ef4444, #f87171); }
+
+/* ── Gate Badge ── */
+.gate-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 8px;
+  background: var(--bg-card);
+}
+
+.gate-badge-community {
+  color: #59b2ff;
+  border: 1px solid rgba(51, 145, 255, 0.3);
+}
+
+/* ── Trust Score Ring ── */
+.trust-ring {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.trust-ring::before {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  padding: 2px;
+  background: conic-gradient(var(--trust-color, #6b7280) calc(var(--trust-pct, 50) * 1%), rgba(31, 41, 55, 0.5) 0);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+/* ── Loading Skeleton ── */
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-card-hover) 50%, var(--bg-card) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+  border-radius: 6px;
+}
+
+/* ══════════════════════════════════════════════
+ *  SCROLLBAR
+ * ══════════════════════════════════════════════ */
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(107, 114, 128, 0.7); }
+
+/* ══════════════════════════════════════════════
+ *  FORM STYLES
+ * ══════════════════════════════════════════════ */
+
+.wimf-input {
+  background: var(--bg-input);
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+}
+
+.wimf-input:focus {
+  border-color: #3391ff;
+  box-shadow: 0 0 0 3px rgba(51, 145, 255, 0.1);
+  outline: none;
+}
+
+/* ══════════════════════════════════════════════
+ *  STAGGER CHILDREN ANIMATIONS
+ * ══════════════════════════════════════════════ */
+
+.stagger-children > * {
+  animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  opacity: 0;
+}
+
+.stagger-children > *:nth-child(1) { animation-delay: 0.03s; }
+.stagger-children > *:nth-child(2) { animation-delay: 0.06s; }
+.stagger-children > *:nth-child(3) { animation-delay: 0.09s; }
+.stagger-children > *:nth-child(4) { animation-delay: 0.12s; }
+.stagger-children > *:nth-child(5) { animation-delay: 0.15s; }
+.stagger-children > *:nth-child(6) { animation-delay: 0.18s; }
+.stagger-children > *:nth-child(7) { animation-delay: 0.21s; }
+.stagger-children > *:nth-child(8) { animation-delay: 0.24s; }
+.stagger-children > *:nth-child(9) { animation-delay: 0.27s; }
+.stagger-children > *:nth-child(10) { animation-delay: 0.30s; }
+.stagger-children > *:nth-child(n+11) { animation-delay: 0.33s; }
+
+/* ══════════════════════════════════════════════
+ *  TOOLTIP
+ * ══════════════════════════════════════════════ */
+
+.wimf-tooltip { position: relative; }
+
+.wimf-tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%; left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  color: var(--text-secondary);
+  font-size: 11px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.wimf-tooltip:hover::after { opacity: 1; }
+
+/* ══════════════════════════════════════════════
+ *  CONNECTION STATUS
+ * ══════════════════════════════════════════════ */
+
+.connection-bar { transition: all 0.3s ease; }
+.connection-bar.connected { background: linear-gradient(90deg, rgba(16, 185, 129, 0.1), transparent); border-color: rgba(16, 185, 129, 0.2); }
+.connection-bar.disconnected { background: linear-gradient(90deg, rgba(245, 158, 11, 0.1), transparent); border-color: rgba(245, 158, 11, 0.2); }
+
+/* ══════════════════════════════════════════════
+ *  RESPONSIVE
+ * ══════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  .aurora-gradient { filter: blur(80px); }
+  .particle { font-size: 12px; }
+  .board-row { min-height: auto; padding: 12px 16px; }
+}

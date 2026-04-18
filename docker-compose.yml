@@ -1,0 +1,231 @@
+# ================================================================
+#  WHERE IS MY FLIGHT — Full Stack Docker Compose
+# ================================================================
+#  Services:
+#    - nginx          : Reverse proxy (port 80)
+#    - laravel-web    : PHP/Laravel web layer
+#    - play-api       : Scala/Play Framework API + WebSocket
+#    - postgres       : PostgreSQL 16
+#    - redis          : Redis 7 (cache + pub/sub)
+#    - zookeeper      : Kafka dependency
+#    - kafka          : Apache Kafka (flight event streaming)
+#    - spark-master   : Spark master node
+#    - spark-worker   : Spark worker node
+# ================================================================
+
+version: '3.9'
+
+services:
+
+  # ─────────────────────────────────────────────
+  # NGINX — Reverse Proxy & Load Balancer
+  # ─────────────────────────────────────────────
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: wimf-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - laravel-web
+      - play-api
+    networks:
+      - wimf-network
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────────
+  # LARAVEL — PHP Web Layer / API Gateway / Auth
+  # ─────────────────────────────────────────────
+  laravel-web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: wimf-laravel
+    env_file: .env
+    volumes:
+      - ./web:/var/www/html
+      - ./frontend/target/scala-3.4.1/wimf-frontend-opt:/var/www/html/public/js/scalajs
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - wimf-network
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────────
+  # PLAY FRAMEWORK — Scala API + WebSocket Server
+  # ─────────────────────────────────────────────
+  play-api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: wimf-play-api
+    env_file: .env
+    ports:
+      - "9000:9000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    networks:
+      - wimf-network
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────────
+  # POSTGRESQL — Primary Database
+  # ─────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: wimf-postgres
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-wimf}
+      POSTGRES_USER: ${DB_USERNAME:-wimf_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-wimf_secret_change_me}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./database/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-wimf_user} -d ${DB_DATABASE:-wimf}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - wimf-network
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────────
+  # REDIS — Cache + Pub/Sub Broker
+  # ─────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: wimf-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - wimf-network
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────────
+  # ZOOKEEPER — Kafka Coordination
+  # ─────────────────────────────────────────────
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: wimf-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    volumes:
+      - zookeeper_data:/var/lib/zookeeper/data
+    networks:
+      - wimf-network
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────────
+  # KAFKA — Flight Event Streaming
+  # ─────────────────────────────────────────────
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: wimf-kafka
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+    ports:
+      - "29092:29092"
+    depends_on:
+      - zookeeper
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    networks:
+      - wimf-network
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────────
+  # SPARK MASTER — Prediction Engine Coordinator
+  # ─────────────────────────────────────────────
+  spark-master:
+    image: bitnami/spark:3.5
+    container_name: wimf-spark-master
+    environment:
+      SPARK_MODE: master
+      SPARK_MASTER_HOST: spark-master
+      SPARK_MASTER_PORT: 7077
+      SPARK_MASTER_WEBUI_PORT: 8080
+    ports:
+      - "7077:7077"
+      - "8080:8080"
+    volumes:
+      - ./spark:/opt/spark-app
+      - spark_models:/opt/spark/models
+    networks:
+      - wimf-network
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────────
+  # SPARK WORKER — Prediction Engine Worker
+  # ─────────────────────────────────────────────
+  spark-worker:
+    image: bitnami/spark:3.5
+    container_name: wimf-spark-worker
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_CORES: 2
+      SPARK_WORKER_MEMORY: 2g
+    depends_on:
+      - spark-master
+    volumes:
+      - ./spark:/opt/spark-app
+      - spark_models:/opt/spark/models
+    networks:
+      - wimf-network
+    restart: unless-stopped
+
+# ─────────────────────────────────────────────
+# VOLUMES
+# ─────────────────────────────────────────────
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  zookeeper_data:
+    driver: local
+  kafka_data:
+    driver: local
+  spark_models:
+    driver: local
+
+# ─────────────────────────────────────────────
+# NETWORKS
+# ─────────────────────────────────────────────
+networks:
+  wimf-network:
+    driver: bridge
+    name: wimf-network

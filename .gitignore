@@ -1,0 +1,58 @@
+# ========================
+# Where Is My Flight
+# ========================
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Dependencies
+vendor/
+node_modules/
+target/
+project/target/
+.bsp/
+.metals/
+.bloop/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Laravel
+web/storage/*.key
+web/storage/framework/cache/*
+web/storage/framework/sessions/*
+web/storage/framework/views/*
+web/bootstrap/cache/*
+
+# Scala / SBT
+*.class
+*.log
+*.jar
+.cache
+.history
+
+# Spark
+spark/metastore_db/
+spark/derby.log
+spark/spark-warehouse/
+
+# Docker
+docker-compose.override.yml
+
+# Compiled JS from Scala.js
+frontend/target/
+frontend/dist/
+
+# Logs
+logs/
+*.log

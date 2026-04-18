@@ -1,0 +1,32 @@
+# ================================================================
+#  WHERE IS MY FLIGHT — Play Framework Routes
+# ================================================================
+
+# ── Flight Board ──
+GET     /api/v1/flights/board/:airportIata    controllers.FlightController.board(airportIata: String, `type`: Option[String])
+GET     /api/v1/flights/search                controllers.FlightController.search(q: String)
+GET     /api/v1/flights/:flightId             controllers.FlightController.show(flightId: String)
+GET     /api/v1/flights/:flightId/status      controllers.FlightController.status(flightId: String)
+
+# ── Airports ──
+GET     /api/v1/airports/:iata                controllers.FlightController.airportInfo(iata: String)
+
+# ── Predictions ──
+GET     /api/v1/predictions/:flightId         controllers.PredictionController.getForFlight(flightId: String)
+POST    /api/v1/predictions/refresh/:flightId controllers.PredictionController.refresh(flightId: String)
+
+# ── Gate Updates (Community) ──
+GET     /api/v1/gates/flight/:flightId        controllers.GateController.gateInfo(flightId: String)
+POST    /api/v1/gates/submit                  controllers.GateController.submit()
+POST    /api/v1/gates/:id/corroborate         controllers.GateController.corroborate(id: String)
+
+# ── Broadcasting ──
+POST    /api/v1/broadcast/gate-update         controllers.BroadcastController.gateUpdate()
+POST    /api/v1/broadcast/flight-update       controllers.BroadcastController.flightUpdate()
+
+# ── WebSocket Endpoints ──
+GET     /ws/board/:airportIata                controllers.WebSocketController.boardStream(airportIata: String)
+GET     /ws/flight/:flightId                  controllers.WebSocketController.flightStream(flightId: String)
+
+# ── Health ──
+GET     /api/v1/health                        controllers.HealthController.check()

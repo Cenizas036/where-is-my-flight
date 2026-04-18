@@ -1,0 +1,374 @@
+/* ================================================================
+ *  WHERE IS MY FLIGHT — Custom Design System
+ *  Beyond Tailwind — animations, glassmorphism, board effects
+ * ================================================================ */
+
+/* ── CSS Custom Properties ── */
+:root {
+  --wimf-glow: 0 0 20px rgba(51, 145, 255, 0.15);
+  --wimf-shadow-card: 0 4px 24px rgba(0, 0, 0, 0.3);
+  --wimf-shadow-elevated: 0 8px 48px rgba(0, 0, 0, 0.4);
+  --glass-bg: rgba(17, 24, 39, 0.6);
+  --glass-border: rgba(75, 85, 99, 0.3);
+  --board-row-height: 64px;
+  --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Glassmorphism Utilities ── */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid var(--glass-border);
+}
+
+.glass-card {
+  background: rgba(17, 24, 39, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(75, 85, 99, 0.25);
+  box-shadow: var(--wimf-shadow-card);
+  transition: all 0.3s var(--transition-smooth);
+}
+
+.glass-card:hover {
+  border-color: rgba(51, 145, 255, 0.3);
+  box-shadow: var(--wimf-shadow-card), var(--wimf-glow);
+  transform: translateY(-1px);
+}
+
+/* ── Flight Board Animations ── */
+@keyframes boardRowSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.98);
+    filter: blur(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes boardRowFlash {
+  0% { background-color: transparent; }
+  25% { background-color: rgba(51, 145, 255, 0.08); }
+  100% { background-color: transparent; }
+}
+
+@keyframes statusPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes delayWarning {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+  50% { box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.15); }
+}
+
+@keyframes predictionFill {
+  from { width: 0%; }
+  to { width: var(--prediction-width, 0%); }
+}
+
+@keyframes gateChange {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.15); background-color: rgba(51, 145, 255, 0.2); }
+  100% { transform: scale(1); }
+}
+
+@keyframes liveIndicator {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ── Board Row Styles ── */
+.board-row {
+  animation: boardRowSlideIn 0.35s var(--transition-smooth) forwards;
+  min-height: var(--board-row-height);
+  position: relative;
+}
+
+.board-row::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 24px;
+  right: 24px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(75, 85, 99, 0.3), transparent);
+}
+
+.board-row.updated {
+  animation: boardRowFlash 1.5s ease-out;
+}
+
+.board-row.gate-changed {
+  animation: gateChange 0.6s ease-out;
+}
+
+/* ── Status Indicators ── */
+.status-live {
+  animation: liveIndicator 2s ease-in-out infinite;
+}
+
+.status-badge-boarding {
+  animation: statusPulse 1.5s ease-in-out infinite;
+}
+
+.delay-warning {
+  animation: delayWarning 2s ease-in-out infinite;
+}
+
+/* ── Prediction Bar ── */
+.prediction-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(31, 41, 55, 0.8);
+  overflow: hidden;
+  position: relative;
+}
+
+.prediction-fill {
+  height: 100%;
+  border-radius: 3px;
+  animation: predictionFill 0.8s var(--transition-smooth) forwards;
+  position: relative;
+}
+
+.prediction-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    transparent 100%
+  );
+  animation: shimmer 2s linear infinite;
+  background-size: 200% 100%;
+}
+
+.prediction-low  { background: linear-gradient(90deg, #10b981, #34d399); }
+.prediction-mid  { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.prediction-high { background: linear-gradient(90deg, #ef4444, #f87171); }
+
+/* ── Gate Badge ── */
+.gate-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 8px;
+  background: rgba(31, 41, 55, 0.8);
+  transition: all 0.3s var(--transition-smooth);
+}
+
+.gate-badge-community {
+  color: #59b2ff;
+  border: 1px solid rgba(51, 145, 255, 0.3);
+  position: relative;
+}
+
+.gate-badge-community::before {
+  content: '👥';
+  font-size: 10px;
+  position: absolute;
+  top: -6px;
+  right: -4px;
+}
+
+/* ── Trust Score Visualization ── */
+.trust-ring {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.trust-ring::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  padding: 2px;
+  background: conic-gradient(
+    var(--trust-color, #6b7280) calc(var(--trust-pct, 50) * 1%),
+    rgba(31, 41, 55, 0.5) 0
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+/* ── Loading Skeleton ── */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(31, 41, 55, 0.5) 25%,
+    rgba(55, 65, 81, 0.5) 50%,
+    rgba(31, 41, 55, 0.5) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+  border-radius: 6px;
+}
+
+.skeleton-text {
+  height: 12px;
+  margin-bottom: 8px;
+}
+
+.skeleton-text:last-child {
+  width: 60%;
+}
+
+/* ── Hero Section ── */
+.hero-gradient {
+  background: radial-gradient(
+    ellipse at 50% 0%,
+    rgba(51, 145, 255, 0.12) 0%,
+    transparent 60%
+  );
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(75, 85, 99, 0.5);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(107, 114, 128, 0.7);
+}
+
+/* ── Responsive Board ── */
+@media (max-width: 768px) {
+  .flight-board-reactive {
+    font-size: 0.875rem;
+  }
+
+  .board-row {
+    min-height: auto;
+    padding: 12px 16px;
+  }
+}
+
+/* ── Utility: Fade-in on mount ── */
+.fade-in-up {
+  animation: fadeInUp 0.4s var(--transition-smooth) forwards;
+}
+
+.scale-in {
+  animation: scaleIn 0.3s var(--transition-smooth) forwards;
+}
+
+/* ── Tooltip ── */
+.wimf-tooltip {
+  position: relative;
+}
+
+.wimf-tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(17, 24, 39, 0.95);
+  border: 1px solid rgba(75, 85, 99, 0.4);
+  color: #d1d5db;
+  font-size: 11px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.wimf-tooltip:hover::after {
+  opacity: 1;
+}
+
+/* ── Form Focus Ring ── */
+.wimf-input:focus {
+  border-color: #3391ff;
+  box-shadow: 0 0 0 3px rgba(51, 145, 255, 0.1);
+  outline: none;
+}
+
+/* ── Connection Status Bar ── */
+.connection-bar {
+  transition: all 0.3s var(--transition-smooth);
+}
+
+.connection-bar.connected {
+  background: linear-gradient(90deg, rgba(16, 185, 129, 0.1), transparent);
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+.connection-bar.disconnected {
+  background: linear-gradient(90deg, rgba(245, 158, 11, 0.1), transparent);
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+/* ── Stagger children animations ── */
+.stagger-children > * {
+  animation: fadeInUp 0.3s var(--transition-smooth) forwards;
+  opacity: 0;
+}
+
+.stagger-children > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger-children > *:nth-child(2) { animation-delay: 0.10s; }
+.stagger-children > *:nth-child(3) { animation-delay: 0.15s; }
+.stagger-children > *:nth-child(4) { animation-delay: 0.20s; }
+.stagger-children > *:nth-child(5) { animation-delay: 0.25s; }
+.stagger-children > *:nth-child(6) { animation-delay: 0.30s; }
+.stagger-children > *:nth-child(7) { animation-delay: 0.35s; }
+.stagger-children > *:nth-child(8) { animation-delay: 0.40s; }
+.stagger-children > *:nth-child(9) { animation-delay: 0.45s; }
+.stagger-children > *:nth-child(10) { animation-delay: 0.50s; }
