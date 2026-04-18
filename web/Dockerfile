@@ -4,72 +4,66 @@ FROM node:22-alpine AS node-builder
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 
 COPY . .
 RUN npm run build
 
-# ── Stage 2: PHP (run Laravel) ─────────────────────────────────────────────
-FROM php:8.2-fpm-alpine AS php-builder
+# ── Stage 2: PHP + Composer ────────────────────────────────────────────────
+FROM php:8.2-fpm-alpine
 
-# Install system dependencies
+# Install system dependencies needed for PHP extensions
 RUN apk add --no-cache \
     bash \
     curl \
-    libpng-dev \
-    libzip-dev \
+    nginx \
     zip \
     unzip \
+    libpng-dev \
+    libjpeg-turbo-dev \
+    freetype-dev \
+    libzip-dev \
     postgresql-dev \
-    oniguruma-dev
+    oniguruma-dev \
+    icu-dev
 
-# Install PHP extensions
-RUN docker-php-ext-install \
+# Configure and install PHP extensions
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
+    docker-php-ext-install -j$(nproc) \
     pdo \
     pdo_pgsql \
     pgsql \
     mbstring \
     zip \
     gd \
-    bcmath
+    bcmath \
+    intl \
+    opcache
 
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-# Copy composer files and install dependencies
-COPY composer.json composer.lock* ./
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+# Copy composer files first (better layer caching)
+COPY composer.json composer.lock ./
 
-# Copy the rest of the app
+# Install PHP dependencies
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
+
+# Copy rest of app
 COPY . .
 
 # Copy built Vite assets from node stage
 COPY --from=node-builder /app/public/build ./public/build
 
+# Run post-install scripts now that full app is present
+RUN composer run-script post-autoload-dump || true
+
 # Set permissions
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/bootstrap/cache
-
-# ── Stage 3: Final image with nginx + php-fpm ──────────────────────────────
-FROM php:8.2-fpm-alpine
-
-RUN apk add --no-cache \
-    nginx \
-    bash \
-    postgresql-dev \
-    libpng-dev \
-    libzip-dev \
-    oniguruma-dev
-
-RUN docker-php-ext-install pdo pdo_pgsql pgsql mbstring zip gd bcmath
-
-WORKDIR /var/www/html
-
-COPY --from=php-builder /var/www/html /var/www/html
-COPY --from=php-builder /usr/bin/composer /usr/bin/composer
+RUN mkdir -p storage/logs storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache && \
+    chown -R www-data:www-data /var/www/html && \
+    chmod -R 755 storage bootstrap/cache
 
 # Nginx config
 RUN mkdir -p /run/nginx
