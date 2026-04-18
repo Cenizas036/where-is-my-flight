@@ -16,6 +16,10 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
+# Replace PORT in nginx config dynamically
+PORT=${PORT:-8080}
+sed -i "s/listen 8080/listen $PORT/g" /etc/nginx/nginx.conf
+
 # Start php-fpm in background
 php-fpm -D
 
