@@ -87,21 +87,7 @@
         </div>
     </div>
 
-    {{-- ═══════════════ LIVE STATS ═══════════════ --}}
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 fade-in-up" style="animation-delay: 0.5s">
-        <div class="glass-card rounded-2xl p-6 pulse-glow">
-            <p class="text-3xl font-bold text-white counter" data-target="{{ $stats['active_flights'] }}">0</p>
-            <p class="text-sm mt-1" style="color: var(--text-muted)">Active Flights Today</p>
-        </div>
-        <div class="glass-card rounded-2xl p-6" style="border-color: rgba(139, 92, 246, 0.2);">
-            <p class="text-3xl font-bold text-purple-400 counter" data-target="{{ $stats['community_updates'] }}">0</p>
-            <p class="text-sm mt-1" style="color: var(--text-muted)">Community Updates Today</p>
-        </div>
-        <div class="glass-card rounded-2xl p-6" style="border-color: rgba(16, 185, 129, 0.2);">
-            <p class="text-3xl font-bold text-emerald-400 counter" data-target="{{ $stats['tracked_flights'] }}">0</p>
-            <p class="text-sm mt-1" style="color: var(--text-muted)">Flights Being Tracked</p>
-        </div>
-    </div>
+
 
     {{-- ═══════════════ WHY JOIN (for guests) ═══════════════ --}}
     @guest

@@ -43,20 +43,10 @@ class DashboardController extends Controller
             ->limit(8)
             ->get();
 
-        // Stats
-        $stats = [
-            'active_flights'    => Flight::where('flight_date', now()->format('Y-m-d'))
-                ->whereNotIn('status', ['arrived', 'cancelled'])->count(),
-            'community_updates' => GateContribution::where('is_live', true)
-                ->whereDate('created_at', now())->count(),
-            'tracked_flights'   => FlightWatch::count(),
-        ];
-
         return view('dashboard', [
             'popularAirports'     => $popularAirports,
             'delayedFlights'      => $delayedFlights,
             'recentContributions' => $recentContributions,
-            'stats'               => $stats,
         ]);
     }
 
