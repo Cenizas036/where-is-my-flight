@@ -60,7 +60,9 @@ class OpenSkyService
                         Cache::forget('opensky:rate_limited');
                         return $flights;
                     }
-                    return $this->getDemoFlights();
+                    
+                    Log::warning('OpenSky API returned 0 flights', ['body' => $response->body()]);
+                    return [];
                 }
 
                 if ($response->status() === 429) {
