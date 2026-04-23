@@ -106,7 +106,6 @@ Our platform leverages a highly scalable polyglot architecture:
 - Flight route fallback ensures that even private or ATC-tracked flights display accurate origin/destination details or dynamically project forward trajectories on the map.
 
 ---
-
-Hosted at !(where-is-my-flight-production.up.railway.app)
+Hosted at: [Where Is My Flight](https://where-is-my-flight-production.up.railway.app)
 
 *Built with ❤️ for aviation geeks and travelers everywhere.*
