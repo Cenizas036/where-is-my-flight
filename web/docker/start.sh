@@ -32,3 +32,4 @@ nginx -t
 echo "Starting nginx on port $PORT..."
 # Start nginx in foreground
 exec nginx -g "daemon off;"
+touch /var/www/html/database/database.sqlite
